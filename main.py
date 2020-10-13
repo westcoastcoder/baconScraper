@@ -13,6 +13,12 @@ Please enter a wiki link that you'd like to start with.
 print(welcomeMsg)
 url = input()
 
+# Confirm link is to a Wikipedia page - exit if not
+if re.search(r'wikipedia',  url.lower()) is None:
+    print("\nThat doesn't look like a Wikipedia link...")
+    print("Try again with a Wikipedia link!")
+    exit()
+
 # request html from user url
 html = requests.get(url)
 
