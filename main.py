@@ -88,7 +88,7 @@ def crawlForBacon(url, soup):
     time.sleep(1)
     if crawlCount < 21:
         print(baconLinks[0])
-        scrapeForBacon("https://en.wikipedia.org" + baconLinks[0], True)
+        scrapeForBacon("https://en.wikipedia.org" + baconLinks[0], 'y')
     else:
         print("Crawl complete!")
 
