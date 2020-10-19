@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 import sys
+import sqlite3
 
 # Create Global Variables
 welcomeMsg = """
@@ -11,7 +12,57 @@ Please enter a wiki link that you'd like to start with.
 """
 
 
-# Create Function
+# Create Bacon Database
+def Baconbase(url, soup):
+    conn = sqlite3.connect("baconscraper.sqlite", isolation_level=None)
+    cur = conn.cursor()
+
+    # Create table if necessary
+    cur.execute('''
+    CREATE TABLE IF NOT EXISTS Baconpages (
+        page_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+        page_title TEXT UNIQUE,
+        page_link TEXT UNIQUE)
+    ''')
+
+    page_title = soup.find(id="firstHeading")
+    page_title = page_title.text
+
+    templink = url.find('/wiki/')
+    page_link = url[templink:]
+
+    dbSQL = ("""INSERT OR IGNORE INTO\
+    Baconpages (page_title, page_link) VALUES (?,?)""")
+
+    cur.execute(dbSQL, (page_title, page_link))
+
+# Create Crawler Function
+def crawlForBacon(url, soup):
+    """Optional Crawler to find more wikipedia pages that mention Bacon"""
+    tags = soup.find(id='bodyContent').find_all('a')
+
+    baconLinks = []
+
+    for tag in tags:
+        try:
+            # We only want wikipedia links (no external links)
+            # and links that are fun (not deadends)
+            if (tag['href'].find("/wiki/") != -1
+                    and tag['href'].find("https://") != 0
+                    and tag['href'].find("/Category:") == -1
+                    and tag['href'].find("(identifier)") == -1
+                    and tag['href'].find("/File:") == -1
+                    and tag['href'].find("/Help:") == -1
+                    and tag['href'].find("Special:BookSources") == -1
+                    and tag['href'].find("/Template:") == -1):
+                baconLinks.append(tag['href'])
+        # This is to catch any errors where an href attribute is not present
+        except KeyError:
+            print("Error: No href attribute present in 'a' tag.")
+            continue
+
+
+# Create Scrape Function
 def scrapeForBacon(url):
     """scrape to determine if Kevin Bacon is mentioned"""
 
@@ -56,6 +107,7 @@ def scrapeForBacon(url):
     # you define what a sentence is?).
 
     # bodyAnch = soup.find(id='bodyContent').find_all('a')
+    Baconbase(url, soup)
 
 
 # Welcome user to program and request input
