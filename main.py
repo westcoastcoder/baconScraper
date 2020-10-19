@@ -132,10 +132,7 @@ def scrapeForBacon(url, crawler):
     # Update the bacon database
     Baconbase(url, soup, bacRadar)
     # If User has requested crawl, then call crawlfunc
-    if crawler == 'y':
-        crawler = True
-    else:
-        crawler = False
+    crawler = True if crawler == 'y' else False
 
     if crawler is True:
         crawlForBacon(url, soup)
