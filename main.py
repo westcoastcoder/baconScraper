@@ -30,18 +30,30 @@ def scrapeForBacon(url):
     # Pulls the actual text (not anchors/tags content) from the html using
     # the .get_text() function
     bodyCon = soup.find(id='bodyContent').get_text()
+    # print(bodyCon)
 
     # This is the regex used to search our soup for bacon
     bacFinder = re.compile(r'Kevin Bacon')
 
     # Search of the website's text for bacon
     bacon = bacFinder.findall(bodyCon)
+    # print(bacon)
 
     # Let the user know if the page mentions KB at all
     if len(bacon) > 0:
         print("\nKevin Bacon is mentioned on this page!\n")
     else:
         print("\nIt doesn't look like Kevin Bacon is mentioned here...\n")
+
+    # Scrape out sentences that mention Kevin Bacon and
+    # return each sentence to user in the form of a page summary
+    # sentenceFind = re.compile(r'[^.]Kevin Bacon[^.]*\.')
+    # sentencebac = sentenceFind.findall(bodyCon)
+    # print(bodyCon)
+    # for line in sentencebac:
+    #    print(line)
+    # On further research, this is a pretty complex issue (e.g. how do
+    # you define what a sentence is?).
 
     # bodyAnch = soup.find(id='bodyContent').find_all('a')
 
