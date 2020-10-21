@@ -34,7 +34,8 @@ def Baconbase(url, soup, bacRadar):
         page_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
         page_title TEXT UNIQUE,
         page_link TEXT UNIQUE,
-        bacon_found TEXT)
+        bacon_found TEXT,
+        retrieved INTEGER)
     ''')
 
     page_title = soup.find(id="firstHeading")
@@ -76,20 +77,32 @@ def crawlForBacon(url, soup):
                 baconLinks.append(tag['href'])
         # This is to catch any errors where an href attribute is not present
         except KeyError:
-            # print("Error: " + str(e))
-            # print("Error: No href attribute present in 'a' tag.")
             continue
 
     # randomly shuffle the available wiki links
-    random.shuffle(baconLinks)
+    # exit program if no links found
+    if len(baconLinks) > 0:
+        random.shuffle(baconLinks)
+    else:
+        print("No links available on current page.")
+        exit(0)
     # adjust counter
     crawlCount += 1
-    # print(crawlCount)
     # make sure our crawler doesn't move too fast
     time.sleep(1)
     if crawlCount < 21:
-        # print(baconLinks[0])
+        # in progress - currently broken - does not add additional links
+        # may need to create new function that adds wiki links to db
+        for i in range(1, len(baconLinks)):
+            print(len(baconLinks))
+            print(i)
+            print(baconLinks[i])
+            test = 'unknown'
+            time.sleep(1)
+            Baconbase(baconLinks[i], soup, test)
+
         scrapeForBacon("https://en.wikipedia.org" + baconLinks[0], 'y')
+
     else:
         print("Crawl complete!\n")
 
@@ -142,7 +155,7 @@ def scrapeForBacon(url, crawler):
 # Main
 print(welcomeMsg)
 while True:
-    crawler = input("First, do you want to use the auto-crawler? (y/n)")
+    crawler = input("First, do you want to use the auto-crawler? (y/n)\n")
     if crawler not in ('y', 'n'):
         print("Invalid command. Use 'y' or 'n'.")
         sys.exit(1)
@@ -154,6 +167,7 @@ while True:
         print("Invalid command. Use 'y' or 'n'.")
         sys.exit(1)
     elif repeat == 'y':
+        crawlCount = 0
         continue
     else:
         break
