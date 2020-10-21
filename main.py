@@ -12,8 +12,6 @@ welcomeMsg = """
 Hello! Welcome to the BaconScraper.
 This program takes Wikipedia links as input and tells you
 whether or not Kevin Bacon is mentioned.
-
-First, do you want to use the auto-crawler? (y/n)
 """
 
 secMessage = """
@@ -21,6 +19,7 @@ Okay, got it!
 Please enter a wiki link that you'd like to start with.
 """
 
+# Counter for Bacon crawler
 crawlCount = 0
 
 
@@ -41,6 +40,7 @@ def Baconbase(url, soup, bacRadar):
     page_title = soup.find(id="firstHeading")
     page_title = page_title.text
     print("Added " + page_title + " to the Baconbase.\n")
+    print("******************************************************")
 
     templink = url.find('/wiki/')
     page_link = url[templink:]
@@ -76,21 +76,22 @@ def crawlForBacon(url, soup):
                 baconLinks.append(tag['href'])
         # This is to catch any errors where an href attribute is not present
         except KeyError:
-            print("Error: No href attribute present in 'a' tag.")
+            # print("Error: " + str(e))
+            # print("Error: No href attribute present in 'a' tag.")
             continue
 
     # randomly shuffle the available wiki links
     random.shuffle(baconLinks)
     # adjust counter
     crawlCount += 1
-    print(crawlCount)
+    # print(crawlCount)
     # make sure our crawler doesn't move too fast
     time.sleep(1)
     if crawlCount < 21:
-        print(baconLinks[0])
+        # print(baconLinks[0])
         scrapeForBacon("https://en.wikipedia.org" + baconLinks[0], 'y')
     else:
-        print("Crawl complete!")
+        print("Crawl complete!\n")
 
 
 # Create Scrape Function
@@ -138,16 +139,25 @@ def scrapeForBacon(url, crawler):
         crawlForBacon(url, soup)
 
 
-# Welcome user to program and request input
+# Main
 print(welcomeMsg)
-crawler = input()
-if crawler not in ('y', 'n'):
-    print("Invalid command. Use 'y' or 'n'.")
-    sys.exit(1)
-print(secMessage)
-url = input()
-
-scrapeForBacon(url, crawler)
+while True:
+    crawler = input("First, do you want to use the auto-crawler? (y/n)")
+    if crawler not in ('y', 'n'):
+        print("Invalid command. Use 'y' or 'n'.")
+        sys.exit(1)
+    print(secMessage)
+    url = input()
+    scrapeForBacon(url, crawler)
+    repeat = input("All done. Want to run it again? (y/n)\n")
+    if repeat not in ('y', 'n'):
+        print("Invalid command. Use 'y' or 'n'.")
+        sys.exit(1)
+    elif repeat == 'y':
+        continue
+    else:
+        break
+sys.exit(0)
 
 # Scrape out sentences that mention Kevin Bacon and
 # return each sentence to user in the form of a page summary
